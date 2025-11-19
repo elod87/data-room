@@ -14,6 +14,7 @@
         "test:ui": "vitest --ui --coverage.enabled=true"
     },
     "dependencies": {
+        "@cubone/react-file-manager": "^1.32.0",
         "@emotion/react": "^11.14.0",
         "@emotion/styled": "^11.14.0",
         "@mui/material": "^6.4.3",
