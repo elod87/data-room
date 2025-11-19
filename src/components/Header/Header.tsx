@@ -1,19 +1,7 @@
-import { Box } from '@mui/material'
+import { HeaderContainer } from './Header.styled'
 
 const Header = () => {
-    return (
-        <Box
-            sx={{
-                width: '100%',
-                padding: 2,
-                border: '1px solid',
-                borderColor: 'divider',
-                borderRadius: 1,
-            }}
-        >
-            Header placeholder
-        </Box>
-    )
+    return <HeaderContainer>Header placeholder</HeaderContainer>
 }
 
 export default Header
