@@ -4,6 +4,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useMemo } from 'react'
 
 import { FileItemDto } from '../../types/fileManager'
+import PdfPreview from '../PdfPreview/PdfPreview'
 import {
     useCreateFolder,
     useDeleteItems,
@@ -11,14 +12,14 @@ import {
     useRenameItem,
 } from './DataRoomManager.query'
 
+const API_BASE_URL = import.meta.env.VITE_API_URL
+
 const DataRoomManager = () => {
     const { data: files } = useFiles()
     const queryClient = useQueryClient()
     const createFolderMutation = useCreateFolder()
     const deleteItemsMutation = useDeleteItems()
     const renameItemMutation = useRenameItem()
-
-    const API_BASE_URL = import.meta.env.VITE_API_URL
 
     const filesData: FileItem[] = useMemo(
         () =>
@@ -82,7 +83,7 @@ const DataRoomManager = () => {
     }
 
     const handleFileUploading = (
-        _file: File,
+        _item: FileItem,
         parentFolder: FileItem | null
     ): { [key: string]: string | null } => {
         let parentId: string | null = null
@@ -138,7 +139,6 @@ const DataRoomManager = () => {
             files={filesData}
             acceptedFileTypes=".pdf"
             collapsibleNav={true}
-            enableFilePreview={true}
             onCreateFolder={handleCreateFolder}
             onDelete={handleDelete}
             onRename={handleRename}
@@ -148,6 +148,11 @@ const DataRoomManager = () => {
             fileUploadConfig={{
                 url: `${API_BASE_URL}/file-system/upload`,
                 method: 'POST',
+            }}
+            enableFilePreview={true}
+            filePreviewPath={`${API_BASE_URL}`}
+            filePreviewComponent={(item: FileItem) => {
+                return <PdfPreview item={item} />
             }}
             permissions={{
                 copy: false,

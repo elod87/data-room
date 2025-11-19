@@ -21,13 +21,15 @@ declare module '@cubone/react-file-manager' {
             headers?: Record<string, string>
         }
         onFileUploading?: (
-            file: File,
+            item: FileItem,
             parentFolder: FileItem | null
         ) => { [key: string]: string | null }
         onFileUploaded?: (item: FileItem) => void
         onDownload?: (items: FileItem[]) => void
         collapsibleNav?: boolean
         enableFilePreview?: boolean
+        filePreviewPath: string
+        filePreviewComponent?: (item: FileItem) => React.ReactNode
         permissions?: {
             create?: boolean
             upload?: boolean
