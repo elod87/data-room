@@ -5,5 +5,6 @@ export const HomeContainer = styled(Box)({
     display: 'flex',
     width: '100%',
     height: '100%',
-    overflow: 'hidden',
+    justifyContent: 'center',
+    alignItems: 'center',
 })

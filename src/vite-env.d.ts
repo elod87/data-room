@@ -11,6 +11,8 @@ declare module '@cubone/react-file-manager' {
 
     export interface FileManagerProps {
         files: FileItem[]
+        height?: string | number
+        width?: string | number
         onCreateFolder?: (name: string, parentFolder: FileItem) => void
         onDelete?: (items: FileItem[]) => void
         onRename?: (item: FileItem, newName: string) => void

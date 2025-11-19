@@ -21,6 +21,7 @@ const PdfPreview = ({ item }: PdfPreviewProps) => {
     const [numPages, setNumPages] = useState<number>(0)
     const [pageNumber, setPageNumber] = useState<number>(1)
     const [isLoading, setIsLoading] = useState<boolean>(true)
+    const [isError, setIsError] = useState<boolean>(false)
 
     const getFilePreviewUrl = (item: FileItem): string | null => {
         // remove /api ending from API_BASE_URL
@@ -41,6 +42,7 @@ const PdfPreview = ({ item }: PdfPreviewProps) => {
     const onDocumentLoadError = (error: Error) => {
         console.error('Error loading PDF:', error)
         setIsLoading(false)
+        setIsError(true)
     }
 
     const changePage = (offset: number) => {
@@ -64,7 +66,7 @@ const PdfPreview = ({ item }: PdfPreviewProps) => {
             >
                 <Page pageNumber={pageNumber} />
             </Document>
-            {!isLoading && (
+            {!isLoading && !isError && (
                 <Box
                     display="flex"
                     justifyContent="center"

@@ -136,6 +136,8 @@ const DataRoomManager = () => {
 
     return (
         <FileManager
+            height="95%"
+            width="95%"
             files={filesData}
             acceptedFileTypes=".pdf"
             collapsibleNav={true}
