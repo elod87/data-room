@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/main.tsx","./src/vite-env.d.ts","./src/components/common/button/button.test.tsx","./src/components/common/button/button.tsx","./src/pages/test/test.tsx","./src/pages/test/test.query.ts","./src/routes/approute.tsx","./src/services/fetchservice.ts","./setuptest.ts"],"errors":true,"version":"5.6.3"}
