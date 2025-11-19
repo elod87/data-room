@@ -44,6 +44,23 @@ export const updateData = async (endpoint: string, body: BodyInit) => {
     })
 }
 
-export const deleteData = async (endpoint: string) => {
-    return fetchData(endpoint, { method: 'DELETE' })
+export const patchData = async <T>(
+    endpoint: string,
+    body: BodyInit
+): Promise<T> => {
+    return fetchData<T>(endpoint, {
+        method: 'PATCH',
+        body: JSON.stringify(body),
+    })
+}
+
+export const deleteData = async <T>(
+    endpoint: string,
+    body?: BodyInit
+): Promise<T> => {
+    const options: RequestInit = { method: 'DELETE' }
+    if (body) {
+        options.body = JSON.stringify(body)
+    }
+    return fetchData<T>(endpoint, options)
 }

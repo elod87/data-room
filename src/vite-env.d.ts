@@ -11,7 +11,7 @@ declare module '@cubone/react-file-manager' {
 
     export interface FileManagerProps {
         files: FileItem[]
-        onCreateFolder?: (name: string, parentFolder: string) => void
+        onCreateFolder?: (name: string, parentFolder: FileItem) => void
         onDelete?: (items: FileItem[]) => void
         onRename?: (item: FileItem, newName: string) => void
         acceptedFileTypes?: string
@@ -20,8 +20,23 @@ declare module '@cubone/react-file-manager' {
             method?: string
             headers?: Record<string, string>
         }
+        onFileUploading?: (
+            file: File,
+            parentFolder: FileItem | null
+        ) => { [key: string]: string | null }
+        onFileUploaded?: (item: FileItem) => void
+        onDownload?: (items: FileItem[]) => void
         collapsibleNav?: boolean
         enableFilePreview?: boolean
+        permissions?: {
+            create?: boolean
+            upload?: boolean
+            move?: boolean
+            copy?: boolean
+            rename?: boolean
+            download?: boolean
+            delete?: boolean
+        }
     }
 
     export const FileManager: React.FC<FileManagerProps>
