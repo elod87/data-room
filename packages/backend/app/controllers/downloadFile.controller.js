@@ -29,13 +29,14 @@ const downloadFile = async (req, res) => {
     }
 
     if (isSingleFile) {
-      const file = FileSystem.findById(files);
+      // Verify file exists and belongs to user
+      const file = FileSystem.findByIdAndUserId(files, req.userId);
       if (!file) return res.status(404).json({ error: "File not found!" });
 
       if (file.isDirectory) {
         files = [files];
       } else {
-        const filePath = path.join(__dirname, "../../public/uploads", file.path);
+        const filePath = path.join(__dirname, "../../public/uploads", req.userId, file.path);
         if (fs.existsSync(filePath)) {
           res.setHeader("Content-Disposition", `attachment; filename="${file.name}"`);
           return res.sendFile(filePath);
@@ -45,9 +46,10 @@ const downloadFile = async (req, res) => {
       }
     }
 
-    const multipleFiles = FileSystem.findByIds(files);
+    // Verify all files exist and belong to user
+    const multipleFiles = files.map(id => FileSystem.findByIdAndUserId(id, req.userId)).filter(Boolean);
     if (!multipleFiles || multipleFiles.length !== files.length) {
-      return res.status(404).json({ error: "One or more of the provided file IDs do not exist." });
+      return res.status(404).json({ error: "One or more of the provided file IDs do not exist or you don't have access." });
     }
 
     const archive = archiver("zip", { zlib: { level: 9 } });
@@ -59,7 +61,7 @@ const downloadFile = async (req, res) => {
     archive.pipe(res);
 
     multipleFiles.forEach((file) => {
-      const filePath = path.join(__dirname, "../../public/uploads", file.path);
+      const filePath = path.join(__dirname, "../../public/uploads", req.userId, file.path);
       if (fs.existsSync(filePath)) {
         if (file.isDirectory) {
           archive.directory(filePath, file.name);

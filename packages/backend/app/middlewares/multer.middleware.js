@@ -5,15 +5,17 @@ const fs = require("fs");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    let uploadPath = path.join(__dirname, "../../public/uploads");
+    // Store files in user-specific directory
+    const userId = req.userId; // From auth middleware
+    let uploadPath = path.join(__dirname, "../../public/uploads", userId);
 
     if (req.body.parentId) {
       try {
-        const parentFolder = FileSystem.findById(req.body.parentId);
+        const parentFolder = FileSystem.findByIdAndUserId(req.body.parentId, userId);
         if (!parentFolder || !parentFolder.isDirectory) {
           return cb(new Error("Invalid parentId!"), false);
         }
-        uploadPath = path.join(__dirname, "../../public/uploads", parentFolder.path);
+        uploadPath = path.join(__dirname, "../../public/uploads", userId, parentFolder.path);
       } catch (error) {
         return cb(error, false);
       }

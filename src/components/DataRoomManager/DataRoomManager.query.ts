@@ -1,3 +1,4 @@
+import { useAuth } from '@clerk/clerk-react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import {
@@ -14,22 +15,25 @@ import {
 } from '../../types/fileManager'
 
 export const useFiles = () => {
+    const { getToken } = useAuth()
+
     return useQuery({
         queryKey: ['files'],
         queryFn: () => {
             const url = `/file-system`
-            return getData<FileItemDto[]>(url)
+            return getData<FileItemDto[]>(url, getToken)
         },
     })
 }
 
 export const useCreateFolder = () => {
     const queryClient = useQueryClient()
+    const { getToken } = useAuth()
 
     return useMutation({
-        mutationFn: (data: CreateFolderRequest) => {
+        mutationFn: async (data: CreateFolderRequest) => {
             const url = `/file-system/folder`
-            return postData(url, data as unknown as BodyInit)
+            return postData(url, data as unknown as BodyInit, getToken)
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['files'] })
@@ -39,11 +43,12 @@ export const useCreateFolder = () => {
 
 export const useDeleteItems = () => {
     const queryClient = useQueryClient()
+    const { getToken } = useAuth()
 
     return useMutation({
-        mutationFn: (data: DeleteItemsRequest) => {
+        mutationFn: async (data: DeleteItemsRequest) => {
             const url = `/file-system`
-            return deleteData(url, data as unknown as BodyInit)
+            return deleteData(url, data as unknown as BodyInit, getToken)
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['files'] })
@@ -53,11 +58,12 @@ export const useDeleteItems = () => {
 
 export const useRenameItem = () => {
     const queryClient = useQueryClient()
+    const { getToken } = useAuth()
 
     return useMutation({
-        mutationFn: (data: RenameItemRequest) => {
+        mutationFn: async (data: RenameItemRequest) => {
             const url = `/file-system/rename`
-            return patchData(url, data as unknown as BodyInit)
+            return patchData(url, data as unknown as BodyInit, getToken)
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['files'] })

@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const upload = require("../middlewares/multer.middleware");
+const authenticateUser = require("../middlewares/auth.middleware");
 const createFolderController = require("../controllers/createFolder.controller");
 const uploadFileController = require("../controllers/uploadFile.controller");
 const getItemsController = require("../controllers/getItems.controller");
@@ -8,6 +9,9 @@ const moveItemController = require("../controllers/moveItem.controller");
 const renameItemController = require("../controllers/renameItem.controller");
 const deleteItemController = require("../controllers/deleteItem.controller");
 const downloadFileController = require("../controllers/downloadFile.controller");
+
+// Apply authentication middleware to all routes
+router.use(authenticateUser);
 
 router.post("/folder", createFolderController);
 router.post("/upload", upload.single("file"), uploadFileController);

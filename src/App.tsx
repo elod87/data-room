@@ -21,6 +21,8 @@ function App() {
             <ClerkProvider
                 publishableKey={clerkPublishableKey}
                 afterSignOutUrl="/sign-in"
+                signInUrl="/sign-in"
+                signUpUrl="/sign-up"
             >
                 <QueryClientProvider client={queryClient}>
                     <AppContainer>

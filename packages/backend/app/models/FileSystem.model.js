@@ -14,6 +14,17 @@ const findChildren = (parentId) =>
 
 const findByIds = (ids) => fileSystemStore.filter((item) => ids.includes(item._id));
 
+const findByUserId = (userId) => {
+  if (!userId) {
+    console.warn('findByUserId called without userId');
+    return [];
+  }
+  return fileSystemStore.filter((item) => item.userId === userId);
+};
+
+const findByIdAndUserId = (id, userId) => 
+  fileSystemStore.find((item) => item._id === id && item.userId === userId);
+
 const save = (item) => {
     if (!item._id) {
         item._id = generateId();
@@ -56,6 +67,8 @@ module.exports = {
     findByPath,
     findChildren,
     findByIds,
+    findByUserId,
+    findByIdAndUserId,
     save,
     remove,
     update,

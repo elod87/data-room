@@ -26,7 +26,8 @@ const uploadFile = async (req, res) => {
 
     let filePath = "";
     if (parentId) {
-      const parentFolder = FileSystem.findById(parentId);
+      // Verify parent folder exists and belongs to user
+      const parentFolder = FileSystem.findByIdAndUserId(parentId, req.userId);
       if (!parentFolder || !parentFolder.isDirectory) {
         return res.status(400).json({ error: "Invalid parentId!" });
       }
@@ -42,6 +43,7 @@ const uploadFile = async (req, res) => {
       parentId: parentId || null,
       size: file.size,
       mimeType: file.mimetype,
+      userId: req.userId,
     });
 
     res.status(201).json(newFile);

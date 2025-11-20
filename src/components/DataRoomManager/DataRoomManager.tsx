@@ -1,7 +1,8 @@
+import { useAuth } from '@clerk/clerk-react'
 import { FileItem, FileManager } from '@cubone/react-file-manager'
 import '@cubone/react-file-manager/dist/style.css'
 import { useQueryClient } from '@tanstack/react-query'
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { FileItemDto } from '../../types/fileManager'
 import PdfPreview from '../PdfPreview/PdfPreview'
@@ -15,6 +16,16 @@ import {
 const API_BASE_URL = import.meta.env.VITE_API_URL
 
 const DataRoomManager = () => {
+    const { getToken } = useAuth()
+    const [authToken, setAuthToken] = useState<string | null>(null)
+
+    useEffect(() => {
+        const fetchToken = async () => {
+            const token = await getToken()
+            setAuthToken(token)
+        }
+        fetchToken()
+    }, [getToken])
     const { data: files } = useFiles()
     const queryClient = useQueryClient()
     const createFolderMutation = useCreateFolder()
@@ -102,14 +113,7 @@ const DataRoomManager = () => {
         queryClient.invalidateQueries({ queryKey: ['files'] })
     }
 
-    const buildDownloadUrl = (ids: string[]): string => {
-        const queryParams = ids
-            .map(id => `files=${encodeURIComponent(id)}`)
-            .join('&')
-        return `${API_BASE_URL}/file-system/download?${queryParams}`
-    }
-
-    const handleDownload = (items: FileItem[]) => {
+    const handleDownload = async (items: FileItem[]) => {
         if (!files || items.length === 0) {
             return
         }
@@ -123,14 +127,31 @@ const DataRoomManager = () => {
             return
         }
 
-        const downloadUrl = buildDownloadUrl(ids)
+        const queryParams = ids
+            .map(id => `files=${encodeURIComponent(id)}`)
+            .join('&')
+        const downloadUrl = `${API_BASE_URL}/file-system/download?${queryParams}`
+        const token = await getToken()
 
+        const response = await fetch(downloadUrl, {
+            headers: token ? { Authorization: `Bearer ${token}` } : {},
+        })
+
+        if (!response.ok) {
+            console.error('Download failed:', response.statusText)
+            return
+        }
+
+        const blob = await response.blob()
+        const url = window.URL.createObjectURL(blob)
         const link = document.createElement('a')
-        link.href = downloadUrl
+        link.href = url
+        link.download = items.length === 1 ? items[0].name : 'download.zip'
         link.style.display = 'none'
         document.body.appendChild(link)
         link.click()
         document.body.removeChild(link)
+        window.URL.revokeObjectURL(url)
     }
 
     return (
@@ -149,6 +170,9 @@ const DataRoomManager = () => {
             fileUploadConfig={{
                 url: `${API_BASE_URL}/file-system/upload`,
                 method: 'POST',
+                headers: authToken
+                    ? { Authorization: `Bearer ${authToken}` }
+                    : undefined,
             }}
             enableFilePreview={true}
             filePreviewPath={`${API_BASE_URL}`}

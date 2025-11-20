@@ -1,3 +1,4 @@
+import { useAuth } from '@clerk/clerk-react'
 import { FileItem } from '@cubone/react-file-manager'
 import { Box, IconButton } from '@mui/material'
 import { useState } from 'react'
@@ -18,16 +19,21 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
 const API_BASE_URL = import.meta.env.VITE_API_URL
 
 const PdfPreview = ({ item }: PdfPreviewProps) => {
+    const { userId } = useAuth()
     const [numPages, setNumPages] = useState<number>(0)
     const [pageNumber, setPageNumber] = useState<number>(1)
     const [isLoading, setIsLoading] = useState<boolean>(true)
     const [isError, setIsError] = useState<boolean>(false)
 
     const getFilePreviewUrl = (item: FileItem): string | null => {
+        if (!userId) {
+            return null
+        }
+
         // remove /api ending from API_BASE_URL
         const apiBaseUrl = API_BASE_URL.replace('/api', '')
 
-        return `${apiBaseUrl}/${item.path}`
+        return `${apiBaseUrl}/${userId}${item.path}`
     }
 
     const onDocumentLoadSuccess = ({

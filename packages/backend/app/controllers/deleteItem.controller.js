@@ -32,13 +32,14 @@ const deleteItem = async (req, res) => {
   }
 
   try {
-    const items = FileSystem.findByIds(ids);
+    // Verify all items exist and belong to the user
+    const items = ids.map(id => FileSystem.findByIdAndUserId(id, req.userId)).filter(Boolean);
     if (items.length !== ids.length) {
-      return res.status(404).json({ error: "One or more of the provided ids do not exist." });
+      return res.status(404).json({ error: "One or more of the provided ids do not exist or you don't have access." });
     }
 
     const deletePromises = items.map(async (item) => {
-      const itemPath = path.join(__dirname, "../../public/uploads", item.path);
+      const itemPath = path.join(__dirname, "../../public/uploads", req.userId, item.path);
       await fs.promises.rm(itemPath, { recursive: true });
 
       deleteRecursive(item);

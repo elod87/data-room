@@ -15,7 +15,8 @@ const createFolder = async (req, res) => {
 
     let folderPath = "";
     if (parentId) {
-      const parentFolder = FileSystem.findById(parentId);
+      // Verify parent folder exists and belongs to user
+      const parentFolder = FileSystem.findByIdAndUserId(parentId, req.userId);
       if (!parentFolder || !parentFolder.isDirectory) {
         return res.status(400).json({ error: "Invalid parentId" });
       }
@@ -24,7 +25,7 @@ const createFolder = async (req, res) => {
       folderPath = `/${name}`;
     }
 
-    const fullFolderPath = path.join(__dirname, "../../public/uploads", folderPath);
+    const fullFolderPath = path.join(__dirname, "../../public/uploads", req.userId, folderPath);
     if (!fs.existsSync(fullFolderPath)) {
       await fs.promises.mkdir(fullFolderPath, { recursive: true });
     } else {
@@ -36,6 +37,7 @@ const createFolder = async (req, res) => {
       isDirectory: true,
       path: folderPath,
       parentId: parentId || null,
+      userId: req.userId,
     });
 
     /* #swagger.responses[201] = {

@@ -2,7 +2,7 @@ const FileSystem = require("../models/FileSystem.model");
 const fs = require("fs");
 const path = require("path");
 
-const recursiveMove = (sourceItem, destinationFolder) => {
+const recursiveMove = (sourceItem, destinationFolder, userId) => {
   const children = FileSystem.findChildren(sourceItem._id);
   const oldId = sourceItem._id;
 
@@ -17,12 +17,13 @@ const recursiveMove = (sourceItem, destinationFolder) => {
     parentId: destinationFolder?._id || null,
     size: sourceItem.size,
     mimeType: sourceItem.mimeType,
+    userId: userId,
   });
 
   FileSystem.remove(oldId);
 
   for (const child of children) {
-    recursiveMove(child, moveItem);
+    recursiveMove(child, moveItem, userId);
   }
 };
 
@@ -46,22 +47,24 @@ const moveItem = async (req, res) => {
     return res.status(400).json({ error: "Invalid request body, expected an array of sourceIds." });
   }
   try {
-    const sourceItems = FileSystem.findByIds(sourceIds);
+    // Verify all source items exist and belong to user
+    const sourceItems = sourceIds.map(id => FileSystem.findByIdAndUserId(id, req.userId)).filter(Boolean);
     if (sourceItems.length !== sourceIds.length) {
-      return res.status(404).json({ error: "One or more of the provided sourceIds do not exist." });
+      return res.status(404).json({ error: "One or more of the provided sourceIds do not exist or you don't have access." });
     }
 
     const movePromises = sourceItems.map(async (sourceItem) => {
-      const srcFullPath = path.join(__dirname, "../../public/uploads", sourceItem.path);
+      const srcFullPath = path.join(__dirname, "../../public/uploads", req.userId, sourceItem.path);
 
       if (isRootDestination) {
-        const destFullPath = path.join(__dirname, "../../public/uploads", sourceItem.name);
+        const destFullPath = path.join(__dirname, "../../public/uploads", req.userId, sourceItem.name);
         await fs.promises.cp(srcFullPath, destFullPath, { recursive: true });
         await fs.promises.rm(srcFullPath, { recursive: true });
 
-        recursiveMove(sourceItem, null);
+        recursiveMove(sourceItem, null, req.userId);
       } else {
-        const destinationFolder = FileSystem.findById(destinationId);
+        // Verify destination folder exists and belongs to user
+        const destinationFolder = FileSystem.findByIdAndUserId(destinationId, req.userId);
         if (!destinationFolder || !destinationFolder.isDirectory) {
           throw new Error("Invalid destinationId!");
         }
@@ -69,13 +72,14 @@ const moveItem = async (req, res) => {
         const destFullPath = path.join(
           __dirname,
           "../../public/uploads",
+          req.userId,
           destinationFolder.path,
           sourceItem.name
         );
         await fs.promises.cp(srcFullPath, destFullPath, { recursive: true });
         await fs.promises.rm(srcFullPath, { recursive: true });
 
-        recursiveMove(sourceItem, destinationFolder);
+        recursiveMove(sourceItem, destinationFolder, req.userId);
       }
     });
 

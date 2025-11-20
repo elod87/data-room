@@ -26,7 +26,8 @@ const renameItem = async (req, res) => {
   */
   try {
     const { id, newName } = req.body;
-    const item = FileSystem.findById(id);
+    // Verify item exists and belongs to user
+    const item = FileSystem.findByIdAndUserId(id, req.userId);
     if (!item) {
       return res.status(404).json({ error: "File or Folder not found!" });
     }
@@ -34,8 +35,8 @@ const renameItem = async (req, res) => {
     const parentDir = `${path.dirname(item.path)}`;
     const newPath = `${parentDir}${parentDir === "/" ? "" : "/"}${newName}`;
 
-    const oldFullPath = path.join(__dirname, "../../public/uploads", item.path);
-    const newFullPath = path.join(__dirname, "../../public/uploads", newPath);
+    const oldFullPath = path.join(__dirname, "../../public/uploads", req.userId, item.path);
+    const newFullPath = path.join(__dirname, "../../public/uploads", req.userId, newPath);
 
     if (fs.existsSync(newFullPath)) {
       return res.status(400).json({ error: "A file or folder with that name already exists!" });
