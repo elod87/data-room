@@ -1,22 +1,36 @@
+import { ClerkProvider } from '@clerk/clerk-react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { BrowserRouter } from 'react-router-dom'
 
 import './App.css'
-import { AppContainer } from './App.styled'
+import { AppContainer, AppContent } from './App.styled'
 import Header from './components/Header/Header'
 import AppRoutes from './routes/AppRoute'
 
 const queryClient = new QueryClient()
 
+if (!import.meta.env.VITE_CLERK_PUBLISHABLE_KEY) {
+    throw new Error('Missing Publishable Key')
+}
+
+const clerkPublishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
+
 function App() {
     return (
         <BrowserRouter>
-            <QueryClientProvider client={queryClient}>
-                <AppContainer>
-                    <Header />
-                    <AppRoutes />
-                </AppContainer>
-            </QueryClientProvider>
+            <ClerkProvider
+                publishableKey={clerkPublishableKey}
+                afterSignOutUrl="/sign-in"
+            >
+                <QueryClientProvider client={queryClient}>
+                    <AppContainer>
+                        <Header />
+                        <AppContent>
+                            <AppRoutes />
+                        </AppContent>
+                    </AppContainer>
+                </QueryClientProvider>
+            </ClerkProvider>
         </BrowserRouter>
     )
 }

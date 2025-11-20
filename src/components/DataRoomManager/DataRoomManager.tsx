@@ -125,7 +125,6 @@ const DataRoomManager = () => {
 
         const downloadUrl = buildDownloadUrl(ids)
 
-        // Trigger browser download using anchor element
         const link = document.createElement('a')
         link.href = downloadUrl
         link.style.display = 'none'

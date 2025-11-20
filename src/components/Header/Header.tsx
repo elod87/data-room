@@ -1,51 +1,54 @@
-import { Box, Typography } from '@mui/material'
+import { SignInButton, UserButton, useAuth } from '@clerk/clerk-react'
+import { Box, Button, Typography } from '@mui/material'
 
-import { HeaderContainer } from './Header.styled'
+import { HeaderContainer, LogoBox } from './Header.styled'
 
 const Header = () => {
+    const { isSignedIn, isLoaded } = useAuth()
+
     return (
         <HeaderContainer>
-            <Box
-                sx={{
-                    width: 40,
-                    height: 40,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    backgroundColor: '#6155B4',
-                    borderRadius: '8px',
-                    color: 'white',
-                    fontWeight: 'bold',
-                    fontSize: '20px',
-                    flexShrink: 0,
-                }}
-            >
-                AC
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <LogoBox>AC</LogoBox>
+
+                <Box>
+                    <Typography
+                        variant="h6"
+                        component="div"
+                        sx={{
+                            fontWeight: 600,
+                            lineHeight: 1.2,
+                        }}
+                    >
+                        Acme Corp
+                    </Typography>
+                    <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        component="div"
+                        sx={{
+                            fontSize: '0.75rem',
+                            lineHeight: 1,
+                        }}
+                    >
+                        Data Room
+                    </Typography>
+                </Box>
             </Box>
 
-            <Box sx={{ flex: 1 }}>
-                <Typography
-                    variant="h6"
-                    component="div"
-                    sx={{
-                        fontWeight: 600,
-                        lineHeight: 1.2,
-                    }}
-                >
-                    Acme Corp
-                </Typography>
-                <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    component="div"
-                    sx={{
-                        fontSize: '0.75rem',
-                        lineHeight: 1,
-                    }}
-                >
-                    Data Room
-                </Typography>
-            </Box>
+            {isLoaded && (
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    {isSignedIn ? (
+                        <UserButton />
+                    ) : (
+                        <SignInButton mode="modal">
+                            <Button variant="contained" color="primary">
+                                Sign In
+                            </Button>
+                        </SignInButton>
+                    )}
+                </Box>
+            )}
         </HeaderContainer>
     )
 }

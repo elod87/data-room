@@ -7,3 +7,9 @@ export const AppContainer = styled(Box)({
     flexDirection: 'column',
 })
 
+export const AppContent = styled(Box)({
+    flex: 1,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+})
