@@ -37,20 +37,8 @@ cleanupUploadsDirectory()
 
 const app = express()
 
-console.log('CLIENT_URI from env:', process.env.CLIENT_URI)
-
 // CORS setup
-const corsOptions = {
-    origin: process.env.CLIENT_URI,
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-    exposedHeaders: ['Content-Type', 'Authorization'],
-    preflightContinue: false,
-    optionsSuccessStatus: 204,
-}
-
-app.use(cors(corsOptions))
+app.use(cors({ origin: process.env.CLIENT_URI }))
 
 app.use(clerkMiddleware())
 
