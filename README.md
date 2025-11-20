@@ -59,23 +59,6 @@ src/
 └── index.css            # Global styles
 ```
 
-## Tooling
-
-### Development Tools
-
-- **Vite**: Build tool and dev server
-- **TypeScript**: Type-safe JavaScript
-- **ESLint**: Code linting
-- **Prettier**: Code formatting (automatic on save in VSCode)
-
-### Libraries
-
-- **React**
-- **Vite**
-- **Material UI**
-- **Clerk**
-- **React File Manager**
-
 # Data Room Backend
 
 see packages/backend
