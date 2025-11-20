@@ -1,5 +1,6 @@
 import { ClerkProvider } from '@clerk/clerk-react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { Toaster } from 'react-hot-toast'
 import { BrowserRouter } from 'react-router-dom'
 
 import './App.css'
@@ -25,6 +26,7 @@ function App() {
                 signUpUrl="/sign-up"
             >
                 <QueryClientProvider client={queryClient}>
+                    <Toaster />
                     <AppContainer>
                         <Header />
                         <AppContent>

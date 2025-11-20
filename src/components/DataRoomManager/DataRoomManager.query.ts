@@ -1,5 +1,6 @@
 import { useAuth } from '@clerk/clerk-react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import toast from 'react-hot-toast'
 
 import {
     deleteData,
@@ -37,6 +38,10 @@ export const useCreateFolder = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['files'] })
+            toast.success('Folder created successfully')
+        },
+        onError: (error: Error) => {
+            toast.error(error.message || 'Failed to create folder')
         },
     })
 }
@@ -52,6 +57,10 @@ export const useDeleteItems = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['files'] })
+            toast.success('Items deleted successfully')
+        },
+        onError: (error: Error) => {
+            toast.error(error.message || 'Failed to delete items')
         },
     })
 }
@@ -67,6 +76,10 @@ export const useRenameItem = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['files'] })
+            toast.success('Item renamed successfully')
+        },
+        onError: (error: Error) => {
+            toast.error(error.message || 'Failed to rename item')
         },
     })
 }

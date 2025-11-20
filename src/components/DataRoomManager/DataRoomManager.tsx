@@ -3,6 +3,7 @@ import { FileItem, FileManager } from '@cubone/react-file-manager'
 import '@cubone/react-file-manager/dist/style.css'
 import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useMemo, useState } from 'react'
+import toast from 'react-hot-toast'
 
 import { FileItemDto } from '../../types/fileManager'
 import PdfPreview from '../PdfPreview/PdfPreview'
@@ -26,11 +27,21 @@ const DataRoomManager = () => {
         }
         fetchToken()
     }, [getToken])
-    const { data: files } = useFiles()
+    const { data: files, error: filesError } = useFiles()
     const queryClient = useQueryClient()
     const createFolderMutation = useCreateFolder()
     const deleteItemsMutation = useDeleteItems()
     const renameItemMutation = useRenameItem()
+
+    useEffect(() => {
+        if (filesError) {
+            const errorMessage =
+                filesError instanceof Error
+                    ? filesError.message
+                    : 'Failed to fetch files'
+            toast.error(errorMessage)
+        }
+    }, [filesError])
 
     const filesData: FileItem[] = useMemo(
         () =>
@@ -123,35 +134,50 @@ const DataRoomManager = () => {
             .filter((id): id is string => id !== undefined)
 
         if (ids.length === 0) {
-            console.warn('No matching items found to download')
+            toast.error('No matching items found to download')
             return
         }
 
-        const queryParams = ids
-            .map(id => `files=${encodeURIComponent(id)}`)
-            .join('&')
-        const downloadUrl = `${API_BASE_URL}/file-system/download?${queryParams}`
-        const token = await getToken()
+        try {
+            const queryParams = ids
+                .map(id => `files=${encodeURIComponent(id)}`)
+                .join('&')
+            const downloadUrl = `${API_BASE_URL}/file-system/download?${queryParams}`
+            const token = await getToken()
 
-        const response = await fetch(downloadUrl, {
-            headers: token ? { Authorization: `Bearer ${token}` } : {},
-        })
+            const response = await fetch(downloadUrl, {
+                headers: token ? { Authorization: `Bearer ${token}` } : {},
+            })
 
-        if (!response.ok) {
-            console.error('Download failed:', response.statusText)
-            return
+            if (!response.ok) {
+                const errorText = await response.text()
+                let errorMessage = 'Download failed'
+                try {
+                    const errorData = JSON.parse(errorText)
+                    errorMessage = errorData.message || errorMessage
+                } catch {
+                    errorMessage = response.statusText || errorMessage
+                }
+                toast.error(errorMessage)
+                return
+            }
+
+            const blob = await response.blob()
+            const url = window.URL.createObjectURL(blob)
+            const link = document.createElement('a')
+            link.href = url
+            link.download = items.length === 1 ? items[0].name : 'download.zip'
+            link.style.display = 'none'
+            document.body.appendChild(link)
+            link.click()
+            document.body.removeChild(link)
+            window.URL.revokeObjectURL(url)
+            toast.success('Download completed successfully')
+        } catch (error) {
+            const errorMessage =
+                error instanceof Error ? error.message : 'Download failed'
+            toast.error(errorMessage)
         }
-
-        const blob = await response.blob()
-        const url = window.URL.createObjectURL(blob)
-        const link = document.createElement('a')
-        link.href = url
-        link.download = items.length === 1 ? items[0].name : 'download.zip'
-        link.style.display = 'none'
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
-        window.URL.revokeObjectURL(url)
     }
 
     return (
