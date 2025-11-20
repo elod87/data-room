@@ -1,5 +1,9 @@
 # Data Room Frontend
 
+## Overview
+
+**Data Room** is a secure, web-based file management application for organizing and managing PDF documents. Built with React, TypeScript, and Material UI, it provides a file manager interface where authenticated users can upload, organize, preview, and download PDF files in a hierarchical folder structure. The application uses Clerk for authentication, supporting Google sign-in and email/password registration.
+
 ## Installation
 
 1. **Install dependencies**:
@@ -64,3 +68,7 @@ src/
 - **Material UI**
 - **Clerk**
 - **React File Manager**
+
+# Data Room Backend
+
+see packages/backend
