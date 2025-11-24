@@ -1,11 +1,14 @@
 import { useAuth } from '@clerk/clerk-react'
 import { FileItem, FileManager } from '@cubone/react-file-manager'
 import '@cubone/react-file-manager/dist/style.css'
+import { Box } from '@mui/material'
 import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
 
 import { FileItemDto } from '../../types/fileManager'
+import { getFileType } from '../../utils/fileTypeDetection'
+import ImagePreview from '../ImagePreview/ImagePreview'
 import PdfPreview from '../PdfPreview/PdfPreview'
 import {
     useCreateFolder,
@@ -185,7 +188,6 @@ const DataRoomManager = () => {
             height="95%"
             width="95%"
             files={filesData}
-            acceptedFileTypes=".pdf"
             collapsibleNav={true}
             onCreateFolder={handleCreateFolder}
             onDelete={handleDelete}
@@ -203,7 +205,21 @@ const DataRoomManager = () => {
             enableFilePreview={true}
             filePreviewPath={`${API_BASE_URL}`}
             filePreviewComponent={(item: FileItem) => {
-                return <PdfPreview item={item} />
+                const fileType = getFileType(item.name)
+
+                if (fileType === 'pdf') {
+                    return <PdfPreview item={item} />
+                }
+
+                if (fileType === 'image') {
+                    return <ImagePreview item={item} />
+                }
+
+                return (
+                    <Box sx={{ padding: '20px', textAlign: 'center' }}>
+                        Preview not available for this file type
+                    </Box>
+                )
             }}
             permissions={{
                 copy: false,

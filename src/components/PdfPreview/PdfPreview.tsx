@@ -1,6 +1,6 @@
 import { useAuth } from '@clerk/clerk-react'
 import { FileItem } from '@cubone/react-file-manager'
-import { Box, IconButton } from '@mui/material'
+import { Box, IconButton, Typography } from '@mui/material'
 import { useState } from 'react'
 import { pdfjs } from 'react-pdf'
 import { Document, Page } from 'react-pdf'
@@ -65,13 +65,23 @@ const PdfPreview = ({ item }: PdfPreviewProps) => {
 
     return (
         <>
-            <Document
-                file={getFilePreviewUrl(item)}
-                onLoadSuccess={onDocumentLoadSuccess}
-                onLoadError={onDocumentLoadError}
+            <Box
+                sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    height: '100%',
+                    width: '100%',
+                }}
             >
-                <Page pageNumber={pageNumber} />
-            </Document>
+                <Document
+                    file={getFilePreviewUrl(item)}
+                    onLoadSuccess={onDocumentLoadSuccess}
+                    onLoadError={onDocumentLoadError}
+                >
+                    <Page pageNumber={pageNumber} />
+                </Document>
+            </Box>
             {!isLoading && !isError && (
                 <Box
                     display="flex"
@@ -91,10 +101,10 @@ const PdfPreview = ({ item }: PdfPreviewProps) => {
                     >
                         ←
                     </IconButton>
-                    <p>
+                    <Typography component="span" fontSize={14}>
                         Page {pageNumber || (numPages ? 1 : '--')} of{' '}
                         {numPages || '--'}
-                    </p>
+                    </Typography>
                     <IconButton
                         disabled={pageNumber >= numPages}
                         onClick={nextPage}
