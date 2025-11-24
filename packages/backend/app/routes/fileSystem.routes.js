@@ -14,7 +14,8 @@ const downloadFileController = require("../controllers/downloadFile.controller")
 router.use(authenticateUser);
 
 router.post("/folder", createFolderController);
-router.post("/upload", upload.single("file"), uploadFileController);
+// Support both single file and multiple files
+router.post("/upload", upload.any(), uploadFileController);
 router.post("/copy", copyItemController);
 router.get("/", getItemsController);
 router.get("/download", downloadFileController);
