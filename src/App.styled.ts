@@ -13,4 +13,5 @@ export const AppContent = styled(Box)({
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'auto',
+    backgroundColor: '#f9f9f9',
 })

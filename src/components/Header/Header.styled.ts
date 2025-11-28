@@ -5,7 +5,7 @@ export const HeaderContainer = styled(Box)(({ theme }) => ({
     padding: theme.spacing(2, 3),
     boxSizing: 'border-box',
     justifyContent: 'space-between',
-    backgroundColor: theme.palette.background.paper,
+    backgroundColor: '#fbfbfb',
     borderBottom: `1px solid ${theme.palette.divider}`,
     boxShadow: theme.shadows[1],
     display: 'flex',
